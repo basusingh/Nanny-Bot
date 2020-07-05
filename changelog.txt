@@ -1,0 +1,891 @@
+=====================================================================================
+
+Changes in 2.99 (beta 17)
+
+=============
+
+New Features:
+
+* Changed the underlying technology for making EXE files from perl scripts.
+  Previously, Nanny was built with a commercial product called Perl2Exe
+  Now, nanny is built with an Open Source program called PerlBin.
+    See:  http://perlbin.sourceforge.net/  for details.
+  
+  Perl2Exe would bundle all components inside the EXE, which is why those
+   exe files were so large.  Now, PerlBin uses the "lib" directory to store all
+   of the components that were previously bundled inside the exe.  This means
+   that the EXE's get smaller, but cannot be moved around now (the lib folder
+   must be in the same folder as the EXE)
+
+* Added the !friendlyfire command
+   The !friendlyfire command is an improved version of the old !teamkill command.  
+        (!teamkill now functions just like !friendlyfire)
+
+    You can set !friendlyfire 0 to turn OFF team damage
+    You can set !friendlyfire 1 to turn ON team damage
+    You can set !friendlyfire 2 to turn ON reflected team damage
+    You can set !friendlyfire 3 to turn ON shared team damage
+    
+    !friendlyfire off    will function like a 0
+    !friendlyfire on    will function like a 1
+
+    Access to the !friendlyfire command is controlled by auth_teambalance
+
+* Added the !teambalance command
+   The !teambalance command is for enabling or disabling auto-balanced teams.
+   Usage:  !teambalance on       or       !teambalance off
+    Access to the !friendlyfire command is controlled by auth_friendlyfire   
+
+
+* Added an affiliate server announcements feature.  You can define a list
+  of servers to monitor.  If at least one person is playing at one of the affiliate 
+  servers, then nanny will announce the server name, how many people are
+  playing,  what the current map is, and what the game type is (ctf / tdm / etc)
+  See the "Server Announcements" section in the config file for details.
+
+* Added the !broadcast command. This allows you to broadcast a message
+  out to other servers.   
+
+   Usage:   !broadcast <your message>
+   Example:  !broadcast are there any admins around?
+
+  See the "Broadcast Group" section of the config file for more details.
+    Note: requires rcon password for each server in the broadcast group.
+
+  Access to the !broadcast command is controlled by auth_broadcast
+
+
+* Added /tell awareness so that you can privately tell nanny commands.
+
+* Added the !hostname command for changing the server's name.
+  Usage:  !hostname Free Beer: No Clue
+  Access to the !hostname command is controlled by auth_hostname
+
+* Added PASV FTP support to switch nanny into PASV mode for better
+  dealing with FTP transfers through NAT routers.
+
+  Passive FTP support can be enabled with the config option: 
+    use_passive_ftp = yes
+  (this option is only used if you are using FTP logfiles)
+
+
+* Added the !forgive command.
+  The !forgive command is for making nanny forgive someone for:
+    Spam Repeating 
+    Penalty Points (for bad words / whining)
+    Anti-Idle Timeout
+
+   Usage:   !forgive Doug
+
+   Use this command when nanny is about to kick someone and you want to stop it.
+   Only forgives Spam, Penalty Points, and Idle Time.
+
+   Access to the !forgive command is controlled by auth_forgive
+
+* Added the  !big red button  command.  ( Also:  !nuke )
+  This command was added for the lulz.
+  When executed it will kick every player connected to the server.
+  Access to the command is controlled by auth_big_red_button
+
+
+
+===============
+
+Bugfixes:
+
+* No longer assumes that voting is on by default.  On startup, Nanny will 
+    check the server to learn if voting is enabled or not..
+
+* Will automatically detect when the server crashes now.  This sort of
+    makes the !reset command obsolete now, since Nanny resets herself.
+
+* fixed a divide by zero problem in !stats when a player had no registered kills.
+
+* added flood protection for spam protection.  (lol)  Now nanny will only try to
+   kick someone a maximum of twice for heavy spamming.  Previously, nanny
+   would try to keep kicking the person one time for each time they spammed,
+   even after the person had already been kicked.
+
+* fixed the !unban command so it works with or without a # sign on the unban number
+
+* fixed flood protection for auto-defined words.  Previously, if someone would try an
+  undefined word, it would still trip the flood protection.  Now the flood protection does
+  not trigger until a definition is successfully displayed.
+
+* Made a partial fix of 999 quick-kicks.  Sometimes when the level changes, nanny
+  would kick every player in some circumstances.  Now nanny waites for at least
+  90 seconds after a map ends before checking ping times again.  This prevents
+  MOST of the bad 999 kicks.
+
+
+==============
+
+History:
+# VERSION 2.99 changelog
+# beta 1 - the voting state is now read from the server on startup rather than assumed to be on - me 
+# beta 2 - added server crash detection - automatically !resets itself after a server crash now.
+# beta 3 - fixed a divide by zero condition in !stats when the player has no registered kills
+# beta 4 - added the !friendlyfire command
+# beta 5 - added affiliate server announcements feature.
+# beta 6 - added the !broadcast command
+# beta 7 - added flood protection for spam protection.  (lol)
+# beta 8 - added the !hostname command
+# beta 9 - added the !teambalance command
+# beta 10 - tweaked flood protection for autodefining non-existent words.
+# beta 11 - fixed the !unban command so it works with or without a # sign on the unban number
+# beta 12 - private chat (/tell) awareness
+# beta 13 - added the !forgive command
+# beta 14 - bugfix/work-around where 999 quick kick would kick everyone at the start of a level.
+# beta 15 - added passive FTP support (PASV) (config file option: use_passive_ftp)
+# beta 16 - big red button
+# beta 17 - retired the !teamkill command, and merged it with !friendlyfire
+
+=================
+
+Config File Changes:
+  Assuming that you were previously running version 2.98, 
+  you can upgrade your config file by adding the following:
+
+# =============== BEGIN: Config File Changes for 2.98 to 2.99 ==========================
+
+
+# The !friendlyfire command
+# auth_friendlyfire = 66.114.146.*
+# auth_friendlyfire = disabled
+# auth_friendlyfire = 937779
+# auth_friendlyfire = everyone
+
+# The !broadcast command
+# auth_broadcast = disabled
+# auth_broadcast = everyone
+# auth_broadcast = 66.114.146.*
+# auth_broadcast = 6543210
+
+# The !teambalance command
+# auth_forgive = disabled
+# auth_forgive = everyone
+# auth_forgive = 66.114.146.*
+# auth_forgive = 6543210
+
+# The !hostname command
+# auth_hostname = disabled
+# auth_hostname = everyone
+# auth_hostname = 127.65.43.21
+# auth_hostname = 1234567
+
+# The !forgive command
+# auth_forgive = disabled
+# auth_forgive = everyone
+# auth_forgive = 127.65.43.21
+# auth_forgive = 1234567
+
+# the lolocaust !nuke command
+auth_big_red_button = disabled
+
+
+# ==========================================================================
+#                       Server Announcements
+#
+# Makes periodic announcements about other 'affiliate' servers.  Will
+# announce how many people are playing and what map is playing.  It will
+# not announce empty or full servers.  Helpful feature for trying to get
+# new servers to become more popular.  (and this is a popularity contest.)
+#
+
+affiliate_server_announcements = yes
+
+affiliate_server_announcement_interval = 1900
+
+# Free Beer: NO Hacks
+# affiliate_server = 207.115.82.179:28960
+# Free Beer² NO Hacks
+affiliate_server = 207.115.84.41:28960
+# Free Beer: No Smoke
+affiliate_server = 207.115.84.51:28960
+# Free Beer: Hacks OK
+affiliate_server = 207.115.84.56:28960
+# {G/E} Classic Maps
+affiliate_server = 207.115.82.180:28961
+# {G/E} Custom Maps
+affiliate_server = 207.115.82.180:28962
+# Zebra Killers
+# affiliate_server = 63.208.142.166:28960
+
+affiliate_server_prenouncement = ^4Tired of all these douchebags? There are options...
+affiliate_server_prenouncement = ^3Come sample some of our other fine servers:
+affiliate_server_prenouncement = ^2Looking for a change of pace?  Try some of our other servers:
+affiliate_server_prenouncement = ^1As if this server wasn`t bad enough, wait till you see this crap:
+affiliate_server_prenouncement = ^5Now, available in *new* flavors:
+affiliate_server_prenouncement = ^6Hoping for a chance to hang out with different assholes?
+affiliate_server_prenouncement = ^8Looking to get away from the kids for a while?
+affiliate_server_prenouncement = ^6Help I need an Assbaby sitter over here...
+
+
+
+
+# ==========================================================================
+#
+#                       Broadcast Group
+#
+# The !broadcast <message> command will broadcast the message to all servers
+# defined in this list.
+#
+# The remote_server syntax is:  ip:port:rconassword
+
+# Free Beer: NO Hacks
+# remote_server = 207.115.82.179:28960:examplepass1
+# Free Beer² NO Hacks
+# remote_server = 207.115.84.41:28960:badpassword
+# Free Beer: No Smoke
+# remote_server = 207.115.84.51:28960:goodpassword
+# Free Beer: Hacks OK
+# remote_server = 207.115.84.56:28960:hahanotreally
+# {G/E} Classic Maps
+# remote_server = 207.115.82.180:28961:theseArefake
+# {G/E} Custom Maps
+# remote_server = 207.115.82.180:28962:boguspass
+
+
+
+
+# add this next to the section on FTP logfiles.
+# use_passive_ftp = yes
+
+# =============== END: Config File Changes for 2.98 to 2.99 ==========================
+
+
+End of changelog for version 2.99 (beta 17)
+
+
+
+=====================================================================================
+
+Changes in 2.98
+
+New Features:
+
+* Added support for detecting and banning name thieves.  Some of the
+  new hacks that are out now can steal the names of other players
+  while they are hacking.  Nannybot can now detect and ban these
+  chaos-causing jerks.  You can enable this feature with the
+  config file directive:  ban_name_thieves = yes
+
+* Added map prediction.  You can now use the !nextmap (or !next) 
+  command to show what map will be played next (from the server map 
+  rotation list).  Access to the command is controled via the
+  auth_nextmap directive.  
+
+* Added teamkill control command: !teamkill on  or !teamkill off.
+  Access to the !teamkill command is controlled via the 
+  auth_teamkill directive.
+
+* Separated !gravity from the auth_fly directive.   Previously, the
+  !gravity command was controlled via auth_fly - Now there is a 
+  separate access control directive for gravity:  auth_gravity
+
+* Added auth_override - A new level of access that is HIGHER than 
+  auth_everything, its the SUPER-admin access, typically reserved for
+  the server owner.  It includes all the access that auth_everything
+  includes in addtion to providing access to ALL commands, even ones
+  that have been explicitly set to 'disabled'  (auth_everying does
+  not allow access to things that have been set to to 'disabled')
+
+* Added support for optional MySQL based logging of chat conversation,
+  and what the next map will be.
+
+* Changed the behavior of the !gravity and !speed comands, if you use
+  the command without a number, it will SHOW what the gravity or
+  speed is currently set to. 
+
+
+Bugfixes:
+
+* improved the player name matching (like for !locate player) code so that 
+  it does one more level of color stripping.  This helps with matching names
+  that use double color codes.
+
+* fixed the !define command so that you can give definitions to numbers (like 666)
+
+* fixed a bug that would cause stats to display triwce
+
+* the server now does faster lookup of IP addresses after the level changes.
+  This should provide ip-based auth access immediately after the level starts.
+  (previously, it could take up to 60 seconds for nanny to learn your ip)
+
+* fixed a divide by zero problem with stats that was crashing nanny in rare
+  stats scenarios with new names.
+
+* fixed the FTP code that was causing it to die
+
+* fixed First Blood that was caused by falling to your own death.
+
+* Fixed the !unban command that would crash nanny due to database locking
+
+* changed the default for audit_guid0_players to 'no'.  There seems
+  to be a bug in the socket code.  It happens REALLY often under
+  windows and rarely under linux, but still enough to be annoying.
+  For best stability, I recommend leaving audit_guid0_players set to no.
+
+History:
+# beta 1 - adding mysql logging for jahazz
+# beta 2 - allowed numbers within words for !define - doug and 666
+# beta 3 - added prediction for next level, the !nextmap command - jahazzz
+# beta 4 - double stats for some reason - LazarusLong
+# beta 5 - fixed a bug in map prediction when the list is empty - me
+# beta 6 - added one more strip-color in matching_users for double-color coded players
+# beta 7 - does an rcon status immediately after a level change - helps with early admin access.
+# beta 8 - fixed a divide by zero problem with stats that was crashing nanny. - Google Muffin
+# beta 9 - Added periodic mysql database connection repair if it loses the MySQL server. - me
+# beta 10 - Fixed a bug in the FTP code that was causing it to die - me
+# beta 11 - Added auth_override - a super-admin access that even allows disabled !commands - me
+# beta 12 - Added support for detecting and banning name thieves - me
+# beta 13 - Fixed a bug in First Blood caused by falling to your death. - me
+# beta 14 - Changed gravity and speed to disclose what they are currently set to - me
+# beta 15 - Separated !gravity from auth_fly.  It now uses auth_gravity.
+# beta 16 - Fixed a bug in !unban command that would crash nanny due to database locking - me
+# beta 17 - !teamkill on/off via (auth_teamkill) - EmoKid
+
+
+Config File Changes:
+  Assuming that you were previously running version 2.97, 
+  you can upgrade your config file by adding the following:
+
+# =============== BEGIN: Config File Changes for 2.97 to 2.98 ==========================
+
+# The !nextmap command
+auth_nextmap = everyone
+
+# the highest level of access - auth_override 
+#  will allow commands that have been explicityly disabled
+# higher than auth_everything access
+auth_override = 66.114.146.*
+auth_override = 67.183.250.215
+auth_override = 66.114.156.48
+auth_override = 937779
+
+# ==============================================================
+#  descriptions are used for helping the server know what the
+#  proper names of levels and gametypes are.  Many of the
+#  level names are not intuitive.  These defintions will
+#  help nannybot be know what the levels and gametypes are called.
+
+description = dm = Deathmatch
+description = tdm = Team Deathmatch
+description = ctf = Capture The Flag
+description = hq = Headquarters
+description = sd = Search and Destroy
+
+description = mp_breakout = Villers-Bocage, France
+description = mp_brecourt = Brecourt, France
+description = mp_burgundy = Burgundy, France
+description = mp_carentan = Carentan, France
+description = mp_dawnville = St. Mere Eglise, France
+description = mp_decoy = El Alamein, Egypt
+description = mp_downtown = Moscow, Russia
+description = mp_farmhouse = Beltot, France
+description = mp_leningrad = Leningrad, Russia
+description = mp_matmata = Matmata, Tunisia
+description = mp_railyard = Stalingrad, Russia
+description = mp_toujane = Toujane, Tunisia
+description = mp_trainstation = Caen, France
+
+# ==========================================================================
+#
+#                            Ban Name Thieves
+#
+# Some hacks out there will steal names in order to confuse admins and make
+# it more difficult to be banned.   Admins and vote-callers are unable
+# to distinguish which player is which, but NannyBot can tell them apart!
+#
+# When enabled, this feature will detect and automatically remove players
+# that are stealing other players' names.  It is a most-rude activity that
+# is usually also acompanied by a nasty aimbot.  
+
+ban_name_thieves = yes
+
+
+# =============== END: Config File Changes for 2.97 to 2.98 ==========================
+
+
+End of changes in 2.98
+
+
+======================================================================
+
+Changes in 2.97
+
+* Restructured the definitions table so that it keeps manually
+  defined definitions separate from the cached definitions
+  that were pulled from the online dictionary.
+
+* Added FTP support so that nannybot can now be run from any
+  remote computer with an internet connection, as long as the
+  CoD2 server allows access to the server logfiles via FTP.
+
+  This should allow many more people to use the program.
+
+  Add this to your nannybot.cfg: 
+  # Examples of running nanny on a remote computer and using FTP logfiles
+  # ftp_username = your_ftp_username
+  # ftp_password = your_ftp_password
+  # server_logfile = ftp://127.216.399.18/path/to/cod2/main/games_mp.log
+
+* Added commands for enabling and disabling weapons.
+  !smoke on/off
+  !grenades on/off
+  !shotguns on/off
+  
+  Access to the weapon control commands are controlled via
+  the auth_weapon_control directive.
+
+* writes a nannybot.pid file or a shutdown_nannybot.bat
+  Windows users require pskill.exe for bat file based shutdown
+  Unix users can kill `cat nannybot.pid` to shut it down
+
+* Made an access directive for exemption from flood protection
+  auth_flood_exemption well exempt a user from flood protection.
+
+* Added a !say command - console will say whatever you tell it to.
+  access to the !say command is controlled by the auth_say directive.
+
+* Added a !tell command
+  Usage !tell <someone> <something>
+  like:   !tell SUK you suck!
+  Will tell multiple people if there are multiple matches.
+
+* Added a !lastkill command
+
+  Use this command to have console tell you who the most recent person
+  to kill you was.  This is handy after you watch a suspicious kill-cam,
+  but missed the name of the player who did it.
+
+  access to the !lastkill command is controlled by the auth_lastkill directive.
+
+  People with auth_peek access can !lastkill <someone_else> to find
+  out who <someone_else> was last killed by.
+
+* Added a !reset command.
+  Use the !reset command after the server crashes.  If you see the
+  bot repeatedly trying to kick people that aren't connected, you
+  can either restart the nannybot program - or use the !reset command.
+
+  Access to the !reset command is controled by the auth_reset directive.
+
+* Added the !fixaliases command.
+  Sometimes the the CoD server messes up and assigns a bunch of people
+  incorrect GUID numbers.  This pollutes one of the aliases databases with
+  bad information.  Use the !fixaliases command to purge the database
+  that gets polluted.  This will delete many records from the aliases
+  database, including some records that are correct.  Aliases that are
+  associated by IP address will not be affected.
+
+  This will also delete any corrupted names (names that are longer than
+  31 charachters)
+
+  Access is controled by the auth_fixaliases directive.
+
+* fixed a bug in the KKRcon library that was causing corrupt aliases
+  Traced it to a bug in the actual CoD server code - it drops a byte
+  or two from long rcon responses.  Now we mark corrupted / incomplete
+  lines with an "X" at the begining of them.
+
+* The output of a !locate command now also displays the player's slot
+  slot number.  You can use the slot number with the !kick, !ban, and
+  !tempban commands.  Example:   !kick #5
+
+  This is handy when you are trying to kick someone that is changing
+  names too fast.  You !locate all - and watch the output for the 
+  player's slot number - when you see the slot number, you can then
+  !kick #number 
+
+* Added a !time command.  This will show the time - ON THE SERVER.
+  This will not localize the time for the player.
+  Access to the !time command is controlled via the auth_time command
+
+* Added a !define / !dictionary command / !undefine command
+  
+  You can use !define <word> to look up <word> in an online dictionary.
+  Results are cached in a local database to avoid having to look up
+  the word 'sex' 452 times a day.
+  
+  Users with auth_add_definition access can add and remove defintions.
+
+  To add a new term, you: 
+     !define term = defintion   (spacing is important)
+  
+  You cannot delete individual definitions, but you can delete all
+  definitions for a word with the !undefine command.  
+  You would:   !undefine term
+  Access to the !undefine command is controlled via auth_add_definition
+
+* bug? fix: disabled anti-vote-rush during S&D - very hard to get votes in.
+
+* internally, nanny pays attention to more details when the level changes.
+  nanny now knows the current game type, name of the game, friendly fire,
+  killcam, the version of COD, the name of the server, maximum number of 
+  clients, maximum ping, maximum number of private clients, pure, and voice.
+
+* bug-fix: No more unrecognized syntax for round/wins.  Cleaned up the regex match.
+  It now annoucnes which team/player won the level when the game is over.  Losers
+  are also spotted now, too.
+
+* bug-fix: On !stats output, now, it will no longer show bullshit calls if 
+  bullshit_calls are disabled.
+
+* on !locate commands, now only those from the US will have their distance
+  shown in miles.  All other players will now have their distance shown
+  in kilometers.
+
+* Added GUID ZEro auditing to remove some people that are using stolen
+  CD Keys.   Add this to your nannybot.cfg file:
+
+# ==========================================================================
+#
+#                            GUID 0 Auditing
+#
+# GUID Zero auditing will periodically select any random player with GUID 0
+#  and ask the Activision server if they are playing with a valid CD Key.
+#  Nanny knows how to directly ask activision and can be more patient than
+#  the CoD server is.  If Activision responds that the CD Key is banned,
+#  then nanny will consider the person to be using a pirated copy and
+#  tempbans the person from the server.   (You cannot ban GUID 0 players)
+#
+# If you want to allow all people to play regardless of the status of their
+#  CD Key, valid or not, then disable this feature.  (set it to: no)
+
+audit_guid0_players = yes
+
+
+
+
+==========================================================================================
+
+Changes in 2.96
+
+* Added a !lastbans command.  You can use the !lastbans command to show the
+  ten most recent bans and how long ago they were banned.  This makes it
+  easier to unban someone, or check to see who was recently banned.
+  If 10 bans is too many or not enough, you can specify the number of
+  bans you want to see after the command.  Like:   !lastbans 25
+  to see the last 25 bans.   50 is the maximum amount that it will show.
+  Access to the !lastbans command is controlled by the auth_ban directive.
+  Anyone who has access to !ban or !unban someone also has the ability
+  to run the !lastbans command.  NOTE:  temporary bans are not listed.  
+
+* Added a new program to the nannybot distribution.  rcon.exe is a slightly
+  customized version of the kkrcon perl program.  This version reads the
+  server IP, port number, and password from the nannybot.cfg that is in the
+  same folder as the rcon.exe.   You should just be able to doubleclick
+  the rcon.exe to be able to type rcon commands at your server.
+
+* Added a new program to the nannybot distribution.  geoip.exe is a
+  small version of the IP lookup utility that nanny uses to map
+  IP addresses to geographic location.   This program operates in one
+  of two modes.  It will either take IP addresses from the command line
+  or from standard-in.   If no IP addresses are specified on the command
+  line, then it read IP addresses from standard in and print back
+  the location of each IP.
+
+* Fixed a bug regarding bullshit calls.  There was a bug with the bullshit
+  subsystem.  Bullshit calls were going to the wrong person in some cases.
+  This has been fixed.   Calling BS too fast, leads to a ''WHINEY BITCH'',
+  which will cause the BS call to filed against the person who called BS.
+
+* Fixed a major bug in the KKrcon library. (The perl library used for
+  sending rcon commands to the server.)  This bug was related to the rcon
+  status command only being able to see the first 13 lines of output.
+  This resulted in nanny having to ''guess'' IP addresses for people that
+  were in slots that couldn't be ''seen'' by the nanny.  Now, nanny can
+  see all slots.  This will eliminate the need to guess IP addresses.
+  This will help in some situations when you try to !ban someone. 
+  (Nanny is now guaranteed to know the correct IP for every player, which
+  does get used in the ban process when the Activision Master is down).
+  This will also help with the !locate command (No more ignored !locate
+  requests due to nanny not knowing the IP).   This will also help with
+  !command authentication for admins when the Activision Master is down.
+  Nanny uses IP addresses as fall-back authentication when the master is
+  down.  Previously, admins that ended up in a slot above 13 would
+  sometimes find their access didn't work.  This should be fixed now.
+  (as long as the admin's IP is defined correctly in the config.)
+
+* Added a few fake !commands (actually, just responses) to the nannybot.cfg 
+  for things like !beer and !dip
+
+* Added a secret !command.  Not telling.
+
+* Added 'Location Spoofing'.  This will let you configure fake locations
+  that people will see when they attempt to !locate someone.  Add the
+  following to your config file:
+  
+# =========================================================================
+#
+#                              Location Spoofing
+#
+# You can define arbitrary locations for specific player names.  This
+# allows you to make someone appear to come from wherever you like.
+#
+# General Format is:
+#  location_spoofing = Name = Place
+#
+# spacing is important.
+# That's: 'space equals-sign space' is how you separate the name
+# matching part from the location part.
+#
+#  The player's name will automatically be pre-pended to the location.
+
+
+location_spoofing = Doug = is from ^2Fuck-OffityLand ^7(6 feet from the server)
+location_spoofing = Bad\^?\d?robot = is from ^2Planet Pluto ^7(4.3 billion miles from the server)
+location_spoofing = Soy.*Sauce = is from ^2Cocomo ^7(off the Florida Keys)
+location_spoofing = Jim.*Lahey\b = is from ^2Sunnyville Trailer Park, Canada ^7 (5,420 km from the server)
+location_spoofing = \dR.*evelations\b = is from ^2Heaven ^7 (An undetermined distance from the server)
+location_spoofing = SUK.*Pride\b = is from ^2Saturn ^7 (933.92 million miles from the server)
+location_spoofing = SUK.*LazarusLong\b = is from ^2Cloud Nine ^7 (really high above the server)
+location_spoofing = SUK.*Platy.*Hitman\b = lives on ^2Free Beer: No Hacks ^7 (0.001 inches from the server)
+location_spoofing = SUK.*Sponge\b = lives ^2in a ^3pineapple ^7 (under the sea)
+location_spoofing = SUK.*indie.*cypherable = is ^2omnipresent ^7(all possible distances from the server)
+location_spoofing = smugllama = lives in a ^2grassy field ^7(next to a river)
+location_spoofing = KlanPapiChulo.*Lucas = is from ^2Bitch-ass, Argentina ^7 (6929 miles from the server)
+location_spoofing = MM.*Dr.*Pepper = joins us from ^2the men`s room stalls ^7 (at the airport)
+location_spoofing = Sp!.*Dy!!.*\? = probably lives ^2inside a cow ^7(200 miles from the server)
+location_spoofing = A .*Ru.[\d\^]*ss[\d\^]*ian = joins us from ^2St. Petersburg, Russia ^7 (6,321 miles from the server.)
+location_spoofing = \|SUK\|.*R.*everand = joins us from ^2inside your pants ^7 (front and center)
+location_spoofing = sarah palin = joins us from ^2in the bathroom, again ^7 (snorting coke off a hooker`s ass)
+location_spoofing = lag.frag...fr3ak = joins us from ^2Fr3aK F3sT ^7 (whatever.)
+
+# ==========================================================================
+
+
+END of changes for 2.96
+
+
+==========================================================================================
+
+Changes in version 2.95
+
+* Added "First Blood".   Nanny will now make an anouncement about the first person to
+  make a kill at the begining of a new map.
+
+Add this to your nannybot.cfg:
+
+# ==========================================================================
+
+#                           First-Blood Anouncements
+
+# By enabling this option, console will announce the names of the first
+# person to be killed and who killed them.  It makes one announcement
+# near the begining of each round.   Search and Destroy is a little
+# buggy:  it will announce first blood for each round of S&D.
+
+first_blood = yes
+
+
+# ==========================================================================
+
+
+* When you !locate someone, it will now calculate and display how many miles away from
+  the server that player is.  No config changes are required.
+  Note: Will not function on servers that run with 192.168.* or 10.* IP Addresses.   
+
+* Added flood protection to the automatic responses to player chat events.  This will
+  stop the dicks that keep saying "hi" over and over and over.  Penalty points are
+  still counted, but the responses are skipped to save time and spam.
+
+* Fixed the !ban and the !tempban command.   The commands are supposed to kick
+  you if you try to use them without access.  The tempban kick was broken and
+  the ban kick was actually a permaban.  Oops.  I had a couple of users baned
+  themselves before I figured out what was happening...
+
+* Added the !speed command.   This command is an rcon mapping to the g_speed
+  command.  Use it to change the speed of how fast things happen.
+  WARNING:  Setting the speed to very fast causes some sort of corruption
+     to the internals of the server that can only be repaired by shutting
+     down and restarting the CoD2 server.   I recommend against using high
+     speeds unless you like restarting your server.
+  It's a novel feature, but somewhat damaging.
+
+  Add this to your nannybot.cfg:
+# the !speed command
+auth_speed = disabled
+# auth_speed = everyone
+# auth_speed = 127.65.43.21
+
+* Added the !gravity command
+  The gravity command is just a straight mapping of the rcon g_gravity command.
+  Use this to set the gravity to different levels for longer than a !fly will.
+  800 is default gravity.  10 - everything floats away. 60 is moon gravity.
+  Authentication for the !gravity command is provided by auth_fly
+
+* Added the "bullshit" assist that will anounce who you are calling bullshit on.
+  This is useful for a number of reasons.  It helps draw attention to potential
+  hackers.  It also is useful in kill-cam scenarios where you decide a kill was
+  not legitimate after watching the killcam and after the name is gone. This
+  will announce that you have called bullshit on the name of the last player
+  that killed you.  It is also reflected in the stats of the person that made
+  the kill.
+
+  Add this to your nannybot.cfg
+# ==========================================================================
+
+#                           Bull-Shit Anouncements
+
+# By enabling this option, console will trigger bullshit calls based on
+# certain things that people say after getting killed. It helps draw
+# attention to potential hackers.  It also is useful in kill-cam scenarios
+  where you decide a kill was not legitimate after watching the killcam
+  and after the name is gone. This will announce that you have called
+  bullshit on the name of the last player that killed you.  It is also
+  reflected in the stats of the person that made the kill.
+
+bullshit_calls = yes
+
+
+# ==========================================================================
+
+
+* Added a 2nd stats column that tracks lots more statistics.  Updated the
+  output of the !stats command to show some of these new stats.
+
+* Added defense against vote-rushing where you vote at the begining of the level
+
+  add this to your nannybot.cfg:
+
+# ==========================================================================
+
+#                           Anti Vote Rushing
+
+# I added this because I got tired of the people with the fast computers
+# calling votes at the begining of a level and getting their votes to
+# pass before anybody else even had a chance to join.  When this feature
+# is enabled, it will briefly turn voting off at the very begining of
+# the level.  This gives more people a chance to join before votes are
+# allowed to be called.
+
+anti_vote_rush = yes
+
+
+# ==========================================================================
+
+* Added killing spree announcements.  Enabling this feature will cause an
+  announcement each time a player beats his previous killing spree record.
+  So far this looks like a hit, a real crowd-pleaser.
+
+  Add this to your nannybot.cfg
+# ==========================================================================
+
+#                           Killing Spree Anouncements
+
+# By enabling this option, console will announce each time a player beats
+# his his previous killing spree record.  It is designed to be done in a way
+# that minimizes the number of announcements.
+
+killing_sprees = yes
+
+# ==========================================================================
+
+# END OF CHANGES FOR 2.95.  If you are upgrading from 2.94, stop reading now.
+
+==========================================================================================
+
+Changes in version 2.94
+
+* Added a new authentication directive, "auth_everything" which grants access to all commands.
+  This makes it easier to give access to everything without having to edit a ton of lines.
+  You can add global admin access (to all commands that are not disabled) now with the config
+  directive   auth_everything = 
+
+* Rewrote the !help command to be more helpful.  Proper access checks for all commands now.
+  You should REMOVE the "help" rule from your nannybot.cfg by deleting these 4 lines:
+     rule_name = help
+     match_text = ^\!?help\s*$
+     penalty = 0
+     response = Available Commands:  !stats, !seen, !locate, !awards, !version, !suk
+
+* IP Addresses that are guessed are now marked as such and treated differently.
+  The differences are:
+    !locate commands against guessed IPs will indicate they are "probably" from somewhere.
+    !aliases commands against guessed IPs will indicate they are "probably" aliases.
+    all !command auth_* directives will no longer grant users access if their IP is guessed.
+  no config changes are required.
+
+* Added an !uptime command that will tell you how long the server has been up and running for.
+  Access to the command is controlled by the  auth_uptime  directive (or auth_everything)  
+
+* Added GUID sanity checking.  This attempts to detect when the server is
+  recording the wrong GUID number for players. 
+  (This feature will not work on "cracked" servers since all users have GUID 0)
+  GUID sanity checking is meant to detect when the server is recording the wrong
+  GUID number for players.  Restart the COD2 server and the nanny to fix GUID
+  sanity problems.
+
+  Add this to your nannybot.cfg:
+# ==========================================================================
+
+#                         GUID sanity checking.
+
+# This attempts to detect when the server is recording the wrong GUID number
+# for players.  When the server is "unsane" it will have bad data that will
+# screw up the !aliases command AND may cause you to unintentionally ban the
+# wrong people.  I have had MY OWN guid banned when banning other people.
+#
+# I dont yet know if Windows-based servers have this problem.  So far I have
+# only observed this problem on linux-based servers.
+#
+# Note: This feature will not work on "cracked" servers since all users have
+#  GUID 0.  When GUID sanity checks fail, Restart the COD2 server and the
+#  nannybot to fix GUID sanity problems.
+
+# If you dont want to use GUID sanity checking, you can disable it here.
+
+guid_sanity_check = yes
+
+
+# ==========================================================================
+
+
+
+* There is now a ban database that records the Name, IP address, and GUID of users
+  that get !banned or !tempbanned.  It may take a minute, but if nanny notices
+  a user playing from an IP address that is banned, It will kick that player. This
+  will help keep banned players out when the Activision master server is down or slow.
+  This will also allow banning of people on "cracked" servers.
+
+* There is now an !unban command to remove temporary or permanant bans.   You can 
+  !unban someone by specifying the ban ID number.  (Like:  !unban 27)  Access to the unban
+  command is controlled by auth_ban or auth_everything.
+
+# ==========================================================================
+
+* Added flood protection.  This makes it so that you have to wait for a while between 
+  issuing !commands.  This is designed so that people can't tie the nannybot up for long
+  periods of time by issueing lots of commands.  I had one user that would say !awards 
+  over and over and over again, and the nanny would take almost an HOUR to stop printing
+  out awards.   No more.  If you try a command and it does nothing, it probably means
+  that flood protection is stopping it.  Wait for a minute or two and try the command again.
+  
+  Add this to your nannybot.cfg
+# ==========================================================================
+
+#                           Flood Protection
+
+# This makes it so that you have to wait for a while between issuing !commands.
+# This is designed so that people can't tie the nannybot up for long periods of
+# time by issueing lots of commands.  I had one user that would say !awards
+# over and over and over again, and the nanny would take almost an HOUR to stop
+# printing out awards.   No more.  If you try a command and it does nothing, it
+# probably means that flood protection is stopping it.  Wait for a minute or two
+# and try the command again.
+
+# If you want users to be able to flood commands, you can disable this setting.
+
+# I recommend that you leave this setting enabled.
+
+flood_protection = yes
+
+# ==========================================================================
+
+
+
+
+
+==========================================================================================
